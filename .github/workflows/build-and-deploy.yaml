@@ -29,3 +29,22 @@ jobs:
         gcloud auth configure-docker asia-southeast2-docker.pkg.dev
         docker build -t asia-southeast2-docker.pkg.dev/$GOOGLE_PROJECT/image-search-repo/fe:latest .
         docker push asia-southeast2-docker.pkg.dev/$GOOGLE_PROJECT/image-search-repo/fe:latest
+
+    - name: create or get GKE cluster
+      env:
+        GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
+      run: |
+          if ! gcloud container clusters describe autopilot-cluster-1 --region asia-southeast2 &>/dev/null; then
+            echo "cluster does not exist, creating new cluster."
+            gcloud container clusters create-auto autopilot-cluster-1 --region asia-southeast2 --project $GOOGLE_PROJECT
+          else
+            echo "cluster already exists, proceeding with deployment."
+          fi
+
+    - name: deploy to GKE
+      env:
+        GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
+      run: |
+        gcloud container clusters get-credentials autopilot-cluster-1 --region asia-southeast2
+        sed -i "s/GOOGLE_PROJECT/$GOOGLE_PROJECT/g" resources.yaml
+        kubectl apply -f resources.yaml
