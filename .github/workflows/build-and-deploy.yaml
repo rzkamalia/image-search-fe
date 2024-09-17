@@ -1,4 +1,4 @@
-name: deploy to GKE
+name: image search frontend deploy
 
 on:
   push:
@@ -10,8 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-    - name: code checkout
-      uses: actions/checkout@v2
+    - name: checkout
+      uses: actions/checkout@v4
 
     - name: authenticate to google cloud
       uses: google-github-actions/auth@v2
@@ -22,14 +22,6 @@ jobs:
     - name: set up cloud SDK
       uses: google-github-actions/setup-gcloud@v2
 
-    - name: install gke-gcloud-auth-plugin
-      run: |
-        echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
-        curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
-        sudo apt-get update
-        sudo apt-get install google-cloud-sdk-gke-gcloud-auth-plugin
-        echo "export USE_GKE_GCLOUD_AUTH_PLUGIN=True" >> $GITHUB_ENV
-
     - name: build and push the docker image
       env:
         GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
@@ -37,23 +29,23 @@ jobs:
         gcloud auth configure-docker asia-southeast2-docker.pkg.dev
         docker build -t asia-southeast2-docker.pkg.dev/$GOOGLE_PROJECT/image-search-repo/fe:latest .
         docker push asia-southeast2-docker.pkg.dev/$GOOGLE_PROJECT/image-search-repo/fe:latest
+  
+    - name: set up GKE credentials
+      uses: google-github-actions/get-gke-credentials@v2
+      with:
+        cluster_name: image-search-clusters
+        location: asia-southeast2
 
-    - name: create or get GKE cluster
-      env:
-        GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
-        CUSTOM_SA: ${{ secrets.CUSTOM_SA }}
-      run: |
-          if ! gcloud container clusters describe autopilot-cluster-1 --region asia-southeast2 &>/dev/null; then
-            echo "cluster does not exist, creating new cluster."
-            gcloud container clusters create-auto autopilot-cluster-1 --region asia-southeast2 --project $GOOGLE_PROJECT --service-account=$CUSTOM_SA
-          else
-            echo "cluster already exists, proceeding with deployment."
-          fi
+    - name: set up Kustomize
+      run: |-
+        curl -sfLo kustomize https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv5.4.3/kustomize_v5.4.3_linux_amd64.tar.gz
+        chmod u+x ./kustomize
 
     - name: deploy to GKE
       env:
         GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
-      run: |
-        gcloud container clusters get-credentials autopilot-cluster-1 --region asia-southeast2
-        kubectl create configmap project-config --from-literal=project_id=$GOOGLE_PROJECT -o yaml --dry-run=client | kubectl apply -f -
-        kubectl apply -f resources.yaml
+      run: |-
+          ./kustomize edit set image LOCATION-docker.pkg.dev/PROJECT_ID/REPOSITORY/IMAGE:TAG=asia-southeast2-docker.pkg.dev/GOOGLE_PROJECT/image-search-repo/fe:latest
+          ./kustomize build . | kubectl apply -f -
+          kubectl rollout status deployment/image-search-fe
+          kubectl get services -o wide
