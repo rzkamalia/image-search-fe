@@ -33,10 +33,11 @@ jobs:
     - name: create or get GKE cluster
       env:
         GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
+        CUSTOM_SA: ${{ secrets.CUSTOM_SA }}
       run: |
           if ! gcloud container clusters describe autopilot-cluster-1 --region asia-southeast2 &>/dev/null; then
             echo "cluster does not exist, creating new cluster."
-            gcloud container clusters create-auto autopilot-cluster-1 --region asia-southeast2 --project $GOOGLE_PROJECT
+            gcloud container clusters create-auto autopilot-cluster-1 --region asia-southeast2 --project $GOOGLE_PROJECT --service-account = $CUSTOM_SA
           else
             echo "cluster already exists, proceeding with deployment."
           fi
