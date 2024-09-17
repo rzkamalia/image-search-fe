@@ -55,5 +55,5 @@ jobs:
         GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
       run: |
         gcloud container clusters get-credentials autopilot-cluster-1 --region asia-southeast2
-        sed -i "s/GOOGLE_PROJECT/$GOOGLE_PROJECT/g" resources.yaml
+        kubectl create configmap project-config --from-literal=project_id=$GOOGLE_PROJECT -o yaml --dry-run=client | kubectl apply -f -
         kubectl apply -f resources.yaml
