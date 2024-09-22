@@ -40,5 +40,5 @@ jobs:
       env:
         GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
       run: |
-        kubectl create deployment image-search-FE --image=asia-southeast2-docker.pkg.dev/$GOOGLE_PROJECT/image-search-repo/fe:latest 
-        kubectl expose deployment image-search-FE --type LoadBalancer --port 3000 --target-port 3000
+        kubectl create deployment image-search-fe --image=asia-southeast2-docker.pkg.dev/$GOOGLE_PROJECT/image-search-repo/fe:latest 
+        kubectl expose deployment image-search-fe --type LoadBalancer --port 3000 --target-port 3000
