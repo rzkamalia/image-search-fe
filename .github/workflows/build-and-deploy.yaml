@@ -39,6 +39,7 @@ jobs:
     - name: deploy to GKE
       env:
         GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
+        APP_NAME: ${{ secrets.APP_NAME }}
       run: |
-        kubectl create deployment image-search-fe --image=asia-southeast2-docker.pkg.dev/$GOOGLE_PROJECT/image-search-repo/fe:latest 
-        kubectl expose deployment image-search-fe --type NodePort --port 3000 --target-port 3000
+        kubectl create deployment $APP_NAME --image=asia-southeast2-docker.pkg.dev/$GOOGLE_PROJECT/image-search-repo/fe:latest 
+        kubectl expose deployment $APP_NAME --type NodePort --port 3000 --target-port 3000
