@@ -42,4 +42,4 @@ jobs:
         APP_NAME: ${{ secrets.APP_NAME }}
       run: |
         kubectl create deployment $APP_NAME --image=asia-southeast2-docker.pkg.dev/$GOOGLE_PROJECT/image-search-repo/fe:latest 
-        kubectl expose deployment $APP_NAME --type NodePort --port 3000 --target-port 3000
+        kubectl expose deployment $APP_NAME --type LoadBalancer --port 3000 --target-port 3000
