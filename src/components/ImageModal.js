@@ -12,7 +12,7 @@ function ImageModal({ image, onClose }) {
         >
           ×
         </button>
-        <img src={`http://34.128.65.153:5000/image/${image}`} alt="Result" className="w-full h-auto max-h-[90vh] object-contain" />
+        <img src={`http://34.50.83.82:5000/image/${image}`} alt="Result" className="w-full h-auto max-h-[90vh] object-contain" />
       </div>
     </div>
   );
