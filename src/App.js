@@ -21,7 +21,7 @@ function App() {
     formData.append('file', file);
 
     try {
-      const response = await axios.post('/api/search', formData, {
+      const response = await axios.post('/search', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       setResults(response.data.results);

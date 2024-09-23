@@ -12,7 +12,7 @@ function ImageModal({ image, onClose }) {
         >
           ×
         </button>
-        <img src={`/api/image/${image}`} alt="Result" className="w-full h-auto max-h-[90vh] object-contain" />
+        <img src={`/image/${image}`} alt="Result" className="w-full h-auto max-h-[90vh] object-contain" />
       </div>
     </div>
   );

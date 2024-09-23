@@ -11,7 +11,7 @@ function SearchResults({ results, setSelectedImage }) {
           <div key={index} className="group cursor-pointer" onClick={() => setSelectedImage(filename)}>
             <div className="relative overflow-hidden rounded-lg shadow-md bg-blue-100">
               <img
-                src={`/api/image/${filename}`}
+                src={`/image/${filename}`}
                 alt={`Result ${index + 1}`}
                 className="w-full h-48 sm:h-40 lg:h-32 object-cover transition duration-300 ease-in-out transform group-hover:scale-110"
               />
