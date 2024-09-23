@@ -21,7 +21,7 @@ function App() {
     formData.append('file', file);
 
     try {
-      const response = await axios.post('http://localhost:5000/search', formData, {
+      const response = await axios.post('http://34.128.65.153:5000/search', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       setResults(response.data.results);
